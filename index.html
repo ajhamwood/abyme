@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Mise en abyme</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="keywords" content="video feedback, feedback loop, abyme, mise en abyme">
+  <meta name="description" content="Video feedback toy.">
+  <link rel="shortcut icon" href="data:image/png;base64,">
+  <link rel="stylesheet" href="abyme.css">
+</head>
+<body>
+  <template id="display">
+    <canvas id="content"></canvas>
+    <svg id="filters">
+      <filter id="glow">
+        <feColorMatrix in="SourceGraphic" type="matrix"	values="1 0 0 0 0.02, 0 1 0 0 0.02, 0 0 1 0 0.02, 0 0 0 1 0"/>
+      </filter>
+    </svg>
+  </template>
+  <template id="ui">
+    <nav>
+      <div id="menu">&#9776;</div>
+      <div id="menu-options">
+        <div id="theme">Theme</div>
+        <div id="theme-options">
+          <div data-theme="white" class="selected">White</div>
+          <div data-theme="black">Black</div>
+          <div data-theme="glow">Glow</div>
+          <div data-theme="mirrorwhite">Mirror&nbsp;white</div>
+          <div data-theme="mirrorblack">Mirror&nbsp;black</div>
+          <div data-theme="mirrorglow">Mirror&nbsp;glow</div>
+        </div>
+      </div>
+    </nav>
+    <svg id="transformer">
+      <rect x="0" y="0" stroke="#000" stroke-width="1" fill="transparent"/>
+      <polygon stroke="#00f" stroke-width="1" fill="transparent"/>
+      <circle id="c01" fill="#f00" r="5"/>
+      <circle id="c00" fill="#f00" r="5"/>
+      <circle id="c11" fill="#f00" r="5"/>
+      <circle id="c10" fill="#f00" r="5"/>
+    </svg>
+  </template>
+  <template id="outofrange">
+    <div id="error">Too many tabs!</div>
+  </template>
+  <script src="abyme.js"></script>
+</body>
+</html>

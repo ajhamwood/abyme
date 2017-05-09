@@ -1,0 +1,86 @@
+
+html, body {
+  height: 100vh;
+  margin: 0;
+  overflow: hidden
+}
+#content {
+  width: 100%;
+  height: 100%
+}
+#buffer, #filter {
+  display: none
+}
+svg#transformer {
+  width: 100%;
+  height: 100%
+}
+#error {
+  margin: auto;
+  padding: 1rem 1.5rem;
+  border: 1px outset #ddd;
+  border-radius: .4rem
+}
+
+/* Menu */
+nav {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
+  width: 0
+}
+nav > * {
+  border: 1px outset grey;
+  padding: .3rem .5rem;
+  background: white
+}
+#menu {
+  border-radius: 5px
+}
+nav :hover {
+  background: lightgrey
+}
+nav [id$=-options] {
+  display: none
+}
+#menu-options {
+  position: relative
+}
+#menu-options > [id$=-options] {
+  position: absolute;
+  right: 100%;
+  top: 0;
+  background: white;
+  border: 1px outset grey
+}
+#menu-options > [id$=-options] > * {
+  padding: .3rem .5rem
+}
+nav.active > #menu {
+  border-radius: 5px 5px 0 0;
+  border-bottom: none
+}
+nav.active > #menu-options {
+  display: block
+}
+#menu-options > :not([id$=-options])::before {
+  content: "\25c4\a0";
+  visibility: hidden
+}
+#menu-options > :not([id$=-options]).active::before {
+  visibility: visible
+}
+#menu-options > :not([id$=-options]).active + [id$=-options] {
+  display: block
+}
+#menu-options > [id$=-options] > *::before {
+  content: "\273b\a0";
+  visibility: hidden
+}
+#menu-options > [id$=-options] > .selected::before {
+  visibility: visible
+}
