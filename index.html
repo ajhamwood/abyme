@@ -11,6 +11,17 @@
 </head>
 <body>
   <template id="display">
+    <div class="modal">
+      <div>
+        <h1>Mise en abyme</h1>
+        <p>If you've ever linked up a camera and a tv in a loop, or seen a painting within a painting within a painting, then you know what mise en abyme - "place into an abyss" - is.</p>
+        <h2>How to use</h2>
+        <p>Open this page in two tabs (or windows). This tab will act as the display, while the other will be the controls.</p>
+        <hr>
+        <p>If you have opened this page as a remote control window, enter your matchword below.</p>
+        <input id="matchword-answerer" type="text" placeholder="matchword">
+      </div>
+    </div>
     <canvas id="content"></canvas>
     <svg id="filters">
       <filter id="glow">
@@ -19,6 +30,9 @@
     </svg>
   </template>
   <template id="ui">
+    <div class="modal">
+      <div>Exit remote window to return to local controls.</div>
+    </div>
     <nav>
       <div id="menu">&#9776;</div>
       <div id="menu-options">
@@ -31,9 +45,23 @@
           <div data-theme="mirrorblack">Mirror&nbsp;black</div>
           <div data-theme="mirrorglow">Mirror&nbsp;glow</div>
         </div>
+        <div id="uitheme">UI&nbsp;theme</div>
+        <div id="uitheme-options">
+          <div data-uitheme="day" class="selected">Day</div>
+          <div data-uitheme="night">Night</div>
+        </div>
+        <div id="connection">Connection</div>
+        <div id="connection-options">
+          <div data-connection="local" class="selected">Local</div>
+          <div data-connection="remote"
+            ><span>Remote</span>
+            <input id="matchword-offerer" type="text" class="hide" placeholder="matchword">
+            <span id="connecting-msg" class="hide">Waiting&nbsp;for&nbsp;answer&nbsp;"<span id="msg-matchword"></span>"<span></span></span>
+          </div>
+        </div>
       </div>
     </nav>
-    <svg id="transformer">
+    <svg id="transformer" class="hide">
       <rect x="0" y="0" stroke="#000" stroke-width="1" fill="transparent"/>
       <polygon stroke="#00f" stroke-width="1" fill="transparent"/>
       <circle id="c01" fill="#f00" r="5"/>
@@ -43,8 +71,17 @@
     </svg>
   </template>
   <template id="outofrange">
-    <div id="error">Too many tabs!</div>
+    <div class="modal">Too many tabs!</div>
   </template>
-  <script src="abyme.js"></script>
+  <template id="remote-js">
+    <script src="remote.js"></script>
+  </template>
+  <template id="display-js">
+    <script src="display.js"></script>
+  </template>
+  <template id="ui-js">
+    <script src="ui.js"></script>
+  </template>
+  <script src="loader.js"></script>
 </body>
 </html>

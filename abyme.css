@@ -2,25 +2,68 @@
 html, body {
   height: 100vh;
   margin: 0;
-  overflow: hidden
-}
+  overflow: hidden }
+  html {
+    font-size: 62.5%;
+    font-family: serif }
+  body {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    color: #4a4a4a;
+    background: #f9f9f9 }
+
+.hide {
+  display: none }
+
 #content {
   width: 100%;
-  height: 100%
-}
-#buffer, #filter {
-  display: none
-}
+  height: 100% }
+#filter {
+  display: none }
 svg#transformer {
   width: 100%;
-  height: 100%
-}
-#error {
-  margin: auto;
-  padding: 1rem 1.5rem;
-  border: 1px outset #ddd;
-  border-radius: .4rem
-}
+  height: 100% }
+  svg#transformer:active {
+    cursor: pointer }
+
+/* Modal dialogue */
+.modal {
+  display: none;
+  position: absolute;
+  background: rgba(255, 255, 255, .85);
+  width: 50%;
+  height: 50%;
+  top: calc(25% - 2px - .4rem);
+  left: calc(25% - 2px - .6rem);
+  padding: .3rem .5rem;
+  border: 2px outset grey;
+  border-radius: .6rem }
+  .modal > * {
+    overflow-y: auto;
+    height: calc(100% - .8rem);
+    padding-bottom: .8rem }
+.modal-active {
+  pointer-events: none }
+  .modal-active > .modal {
+    pointer-events: all;
+    display: inherit }
+h1, h2 {
+  margin: .8rem;
+  line-height: 1.3;
+  font-family: Verdana, Geneva, sans-serif;
+  font-weight: 700 }
+  h1 {
+    font-size: 2.35em }
+  h2 {
+    font-size: 2em }
+hr {
+  border-color: #2c8898 }
+input {
+  border: 1px solid #4a4a4a;
+  font-size: 1.6rem;
+  padding: .3rem .5rem }
+  input:focus {
+    border: 1px solid #2c8898 }
 
 /* Menu */
 nav {
@@ -31,56 +74,78 @@ nav {
   display: inline-flex;
   flex-flow: row wrap;
   justify-content: flex-end;
-  width: 0
-}
-nav > * {
-  border: 1px outset grey;
-  padding: .3rem .5rem;
-  background: white
-}
-#menu {
-  border-radius: 5px
-}
-nav :hover {
-  background: lightgrey
-}
-nav [id$=-options] {
-  display: none
-}
+  width: 0 }
+  nav > * {
+    border: 1px outset grey;
+    padding: .3rem .8rem;
+    background: #f9f9f9 }
+  nav > #menu {
+    border-radius: 5px }
+  nav :not([id$=-options]):hover {
+    background: lightgrey }
+  nav [id$=-options] {
+    display: none }
+
+  nav.active > #menu {
+    border-radius: 5px 5px 0 0;
+    border-bottom: none }
+  nav.active > #menu-options {
+    display: block }
+
 #menu-options {
-  position: relative
-}
-#menu-options > [id$=-options] {
-  position: absolute;
-  right: 100%;
-  top: 0;
-  background: white;
-  border: 1px outset grey
-}
-#menu-options > [id$=-options] > * {
-  padding: .3rem .5rem
-}
-nav.active > #menu {
-  border-radius: 5px 5px 0 0;
-  border-bottom: none
-}
-nav.active > #menu-options {
-  display: block
-}
-#menu-options > :not([id$=-options])::before {
-  content: "\25c4\a0";
-  visibility: hidden
-}
-#menu-options > :not([id$=-options]).active::before {
-  visibility: visible
-}
-#menu-options > :not([id$=-options]).active + [id$=-options] {
-  display: block
-}
-#menu-options > [id$=-options] > *::before {
-  content: "\273b\a0";
-  visibility: hidden
-}
-#menu-options > [id$=-options] > .selected::before {
-  visibility: visible
-}
+  position: relative;
+  padding: 0;
+  border-radius: 5px 0 5px 5px }
+  #menu-options > :first-child {
+    border-top-left-radius: 5px }
+  #menu-options > :nth-last-child(2) {
+    border-radius: 0 0 5px 5px }
+  #menu-options > :nth-child(2) { top: -1px }
+  #menu-options > :nth-child(4) { top: calc(1.9em - 1px) }
+  #menu-options > :nth-child(6) { top: calc(3.8em - 1px) }
+  #menu-options > [id$=-options] {
+    position: absolute;
+    z-index: 1;
+    right: calc(100% + .6rem);
+    background: #f9f9f9;
+    border: 1px outset grey }
+    #menu-options > :not([id$=-options]),
+    #menu-options > [id$=-options] > * {
+      padding: .3rem .8rem }
+
+  #menu-options > :not([id$=-options])::before {
+    content: "\25c4\a0";
+    visibility: hidden }
+  #menu-options > :not([id$=-options]).active::before {
+    visibility: visible }
+  #menu-options > :not([id$=-options]).active + [id$=-options] {
+    display: block }
+  #menu-options > :not([id$=-options]):hover + [id$=-options] {
+    z-index: 2 }
+  #menu-options > [id$=-options] > *::before {
+    content: "\273b\a0";
+    visibility: hidden }
+  #menu-options > [id$=-options] > .selected::before {
+    visibility: visible }
+
+#connecting-msg {
+  white-space: nowrap }
+  #connecting-msg > :last-child {
+    min-width: 2rem;
+    display: inline-block }
+
+/* UI theme */
+.night > svg {
+  background: #222 }
+  .night rect {
+    stroke: #fff }
+  .night polygon {
+    stroke: #44f }
+.night > nav > *,
+.night #menu-options > [id$=-options] {
+  color: #c9c9c9;
+  background-color: #222;
+  border-color: #c9c9c9 }
+.night > nav :not([id$=-options]):hover {
+  background-color: #fff;
+  color: #222 }
