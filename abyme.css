@@ -59,6 +59,7 @@ h1, h2 {
 hr {
   border-color: #2c8898 }
 input {
+  background: #f9f9f9;
   border: 1px solid #4a4a4a;
   font-size: 1.6rem;
   padding: .3rem .5rem }
@@ -81,7 +82,7 @@ nav {
     background: #f9f9f9 }
   nav > #menu {
     border-radius: 5px }
-  nav :not([id$=-options]):hover {
+  nav div:not([id$=-options]):hover {
     background: lightgrey }
   nav [id$=-options] {
     display: none }
@@ -133,6 +134,22 @@ nav {
   #connecting-msg > :last-child {
     min-width: 2rem;
     display: inline-block }
+
+#uniformity {
+  position: absolute;
+  display: table;
+  border: 1px solid grey;
+  top: 5px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 22rem }
+  #uniformity > * {
+    display: table-cell;
+    padding: .3rem .8rem;
+    text-align: center }
+  #uniformity > .selected {
+    background: lightgrey }
 
 /* UI theme */
 .night > svg {

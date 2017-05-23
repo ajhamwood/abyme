@@ -68,17 +68,24 @@ $.addEvents({
     unload: () => { if (appPort.remote) appPort.send("connclosed") }
    },
   "#matchword-answerer": {
-    keypress: e => {
-      if (e.code == "Enter") {
+    keydown: e => {
+      if (e.key == "Enter") {
+        $("#matchword-answerer")[0].classList.add("hide");
+        $("#connecting-msg")[0].classList.remove("hide");
+        $("#msg-matchword")[0].textContent = e.target.value;
+        var x = 0, iv = setInterval(() => $("#connecting-msg > :last-child")[0].textContent = ".".repeat(++x % 4), 300);
         new Remote("ws" + signaluri).answerCall(e.target.value).then(remote => {
+          clearInterval(iv);
           (appPort.setPort(remote, true)).onmessage = e => messageHandler(e);
           $("#modal, #content, #filters").forEach(x => x.remove());
           $("body")[0].classList.remove("modal-active");
           loop = () => {};
           window.removeEventListener("resize", resize);
           $.load("ui-js");
-          worker.port.postMessage(["unload"]);
-          worker.port.postMessage(["load", "ui"]);
+          if (worker) {
+            worker.port.postMessage(["unload"]);
+            worker.port.postMessage(["load", "ui"])
+          }
         })
       }
     }
