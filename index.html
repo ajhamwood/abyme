@@ -20,6 +20,7 @@
         <hr>
         <p>If you have opened this page as a remote control window, enter your matchword below.</p>
         <input id="matchword-answerer" type="text" placeholder="matchword">
+        <span id="connecting-msg" class="hide">Waiting&nbsp;for&nbsp;answer&nbsp;"<span id="msg-matchword"></span>"<span></span></span>
       </div>
     </div>
     <canvas id="content"></canvas>
@@ -61,6 +62,10 @@
         </div>
       </div>
     </nav>
+    <div id="uniformity">
+      <div id="uniform" class="selected">Uniform</div>
+      <div id="nonuniform">Non&#8209;uniform</div>
+    </div>
     <svg id="transformer" class="hide">
       <rect x="0" y="0" stroke="#000" stroke-width="1" fill="transparent"/>
       <polygon stroke="#00f" stroke-width="1" fill="transparent"/>

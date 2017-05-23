@@ -69,67 +69,140 @@ messageHandler = e => {
   showTransform()
 };
 
-let mouse, keyboard = [];
+let utils = {}, keyboard = [], mouseup = true, uniform = true;
+function resetCtrls() {
+  if (uniform) {
+    if (keyboard.indexOf("Shift") != -1) {
+      utils.theta = Math.atan2(utils.y - utils.midpointy, utils.x - utils.midpointx)
+    }
+    if (keyboard.indexOf("Control") != -1) {
+      utils.abs = Math.sqrt(Math.pow(utils.x - utils.midpointx, 2) + Math.pow(utils.y - utils.midpointy, 2))
+    }
+  } else {
+    if (keyboard.length != 2) {
+      let t = transform.get(),
+          det = t[0]*t[3] - t[1]*t[2],
+          i = [t[3]/det, -t[1]/det, -t[2]/det, t[0]/det, (t[2]*t[5] - t[3]*t[4])/det, (t[1]*t[4] - t[0]*t[5])/det],
+          scalex = i[0]*utils.x + i[2]*utils.y + i[4] - utils.premidx,
+          scaley = i[1]*utils.x + i[3]*utils.y + i[5] - utils.premidy;
+      Object.assign(utils, { i, scalex, scaley })
+    } else {
+      utils.theta = Math.atan2(utils.y - utils.midpointy, utils.x - utils.midpointx);
+      utils.abs = Math.sqrt(Math.pow(utils.x - utils.midpointx, 2) + Math.pow(utils.y - utils.midpointy, 2))
+    }
+  }
+}
+
+if ("ontouchstart" in window) {
+  $.addEvents({
+
+  })
+} else {
+  $.addEvents({
+    "": {
+      keydown: e => {
+        e.stopPropagation();
+        let t = transform.get();
+        utils.midpointx = t[0]*utils.premidx + t[2]*utils.premidy + t[4];
+        utils.midpointy = t[1]*utils.premidx + t[3]*utils.premidy + t[5];
+        if (e.key == " ") {
+          uniform = !uniform;
+          $("#uniformity > .selected")[0].classList.remove("selected");
+          $("#uniformity > *")[1-uniform].classList.add("selected");
+        } else if (uniform && ["Shift", "Control"].indexOf(e.key) != -1) {
+          if (keyboard.indexOf(e.key) == -1) keyboard.push(e.key)
+        }
+        resetCtrls()
+      },
+      keyup: e => {
+        e.stopPropagation();
+        if (["Shift", "Control"].indexOf(e.key) != -1) {
+          keyboard.splice(keyboard.indexOf(e.key), 1);
+          resetCtrls()
+        }
+      },
+      mousedown: e => {
+        let t = transform.get().slice(0),
+            viewbox = $("svg")[0].viewBox.baseVal,
+            bounds = $("svg")[0].getBoundingClientRect(),
+            aspectComp = bounds.height/bounds.width > viewbox.height/viewbox.width,
+            scale = [bounds.height/viewbox.height, bounds.width/viewbox.width][+aspectComp],
+            premidx = $("rect")[0].width.baseVal.value / 2,
+            premidy = $("rect")[0].height.baseVal.value / 2,
+            midpointx = t[0]*premidx + t[2]*premidy + t[4],
+            midpointy = t[1]*premidx + t[3]*premidy + t[5],
+            originx = (1 - aspectComp) * (bounds.width - viewbox.width * scale) / 2 - viewbox.x * scale + bounds.left,
+            originy = aspectComp * (bounds.height - viewbox.height * scale) / 2 - viewbox.y * scale + bounds.top,
+            x = (e.clientX - originx) / scale,
+            y = (e.clientY - originy) / scale;
+        utils = Object.assign(utils, { scale, premidx, premidy, midpointx, midpointy, originx, originy, x, y });
+        resetCtrls();
+        mouseup = false
+      },
+      mousemove: e => {
+        e.preventDefault();
+        if (mouseup) return;
+        // TODO: Change to: No key = translation, Shift = scale & rotation, Control = shear & aspect?
+        // TODO: Separate out into functions
+        let x = utils.x, y = utils.y;
+        utils.x = (e.clientX - utils.originx) / utils.scale;
+        utils.y = (e.clientY - utils.originy) / utils.scale;
+        if (uniform) {
+          if (keyboard.length == 0) transform.translate(x - utils.x, y - utils.y);
+          else {
+            if (keyboard.indexOf("Shift") != -1) {
+              let theta = utils.theta;
+              utils.theta = Math.atan2(utils.y - utils.midpointy, utils.x - utils.midpointx);
+              transform.rotate(utils.theta - theta, utils.midpointx, utils.midpointy);
+            }
+            if (keyboard.indexOf("Control") != -1) {
+              let abs = utils.abs;
+              utils.abs = Math.sqrt(Math.pow(utils.x - utils.midpointx, 2) +
+                Math.pow(utils.y - utils.midpointy, 2));
+              transform.scale(utils.abs/abs, utils.midpointx, utils.midpointy);
+            }
+          }
+        } else {
+          if (keyboard.length == 2) {
+            let theta = utils.theta, abs = utils.abs;
+            utils.theta = Math.atan2(utils.y - utils.midpointy, utils.x - utils.midpointx);
+            utils.abs = Math.sqrt(Math.pow(utils.x - utils.midpointx, 2) +
+              Math.pow(utils.y - utils.midpointy, 2));
+            transform.skewRotate(utils.abs/abs, utils.theta - theta, utils.midpointx, utils.midpointy)
+          } else {
+            let i = utils.i, scalex = utils.scalex, scaley = utils.scaley;
+            utils.scalex = i[0]*utils.x + i[2]*utils.y + i[4] - utils.premidx;
+            utils.scaley = i[1]*utils.x + i[3]*utils.y + i[5] - utils.premidy;
+            if (keyboard.toString() == "Shift") {
+              transform.shearX(utils.scalex/scalex, utils.scaley/scaley, utils.midpointx, utils.midpointy)
+            } else if (keyboard.toString() == "Control") {
+              transform.shearY(utils.scalex/scalex, utils.scaley/scaley, utils.midpointx, utils.midpointy)
+            } else if (keyboard.length == 0) {
+              transform.scale2d(utils.scalex/scalex, utils.scaley/scaley, utils.midpointx, utils.midpointy)
+            }
+          }
+        }
+        let tobj = {transform: transform.get()};
+        sessionStorage.data = JSON.stringify(Object.assign(JSON.parse(sessionStorage.data), tobj));
+        appPort.send(tobj);
+        showTransform()
+      },
+      mouseup: e => {
+        e.stopPropagation();
+        mouseup = true;
+        uniform = true;
+        $("#uniformity > .selected")[0].classList.remove("selected");
+        $("#uniformity > :first-child")[0].classList.add("selected")
+      },
+      "drag dragstart": () => false
+    }
+  })
+}
 $.addEvents({
   "": {
     load: () => $(`[data-uitheme=${sessionStorage.uitheme}]`)[0].dispatchEvent(new Event("click")),
-    keydown: e => {
-      e.stopPropagation();
-      if (e.key == "Shift" || e.key == "Control") if (keyboard.indexOf(e.key) == -1) keyboard.push(e.key);
-    },
-    keyup: e => {
-      e.stopPropagation();
-      if (e.key == "Shift" || e.key == "Control") keyboard.splice(keyboard.indexOf(e.key), 1)
-    },
-    mousemove: e => {
-      // TODO: Change to: No key = translation, Shift = scale & rotation, Control = shear & aspect?
-      // TODO: Separate out into functions
-      if (!mouse) return;
-      let viewbox = $("svg")[0].viewBox.baseVal,
-          bounds = $("svg")[0].getBoundingClientRect(),
-          aspectComp = bounds.height/bounds.width > viewbox.height/viewbox.width,
-          scale = [bounds.height/viewbox.height, bounds.width/viewbox.width][+aspectComp],
-          origin = [
-            (1 - aspectComp) * (bounds.width - viewbox.width * scale) / 2 - viewbox.x * scale + bounds.left,
-            aspectComp * (bounds.height - viewbox.height * scale) / 2 - viewbox.y * scale + bounds.top
-          ],
-          premid = [$("rect")[0].width.baseVal.value / 2, $("rect")[0].height.baseVal.value / 2],
-          t = transform.get(),
-          midpoint = [t[0]*premid[0] + t[2]*premid[1] + t[4], t[1]*premid[0] + t[3]*premid[1] + t[5]];
-      if (keyboard.indexOf("Shift") != -1) {
-        let preangle = Math.atan2((mouse[1] - origin[1]) / scale - midpoint[1], (mouse[0] - origin[0]) / scale - midpoint[0]),
-            rot = Math.atan2((e.clientY - origin[1]) / scale - midpoint[1], (e.clientX - origin[0]) / scale - midpoint[0]) - preangle,
-            s = Math.sin(rot), c = Math.cos(rot),
-            tx = midpoint[0] - midpoint[0]*c + midpoint[1]*s,
-            ty = midpoint[1] - midpoint[0]*s - midpoint[1]*c;
-        t = [t[0]*c + t[2]*s, t[1]*c + t[3]*s, t[2]*c - t[0]*s, t[3]*c - t[1]*s,
-          t[0]*tx + t[2]*ty + t[4], t[1]*tx + t[3]*ty + t[5]];
-        if (keyboard.indexOf("Control") != -1) {
-          let preabs = Math.sqrt(Math.pow((mouse[0] - origin[0]) / scale - midpoint[0], 2) +
-                Math.pow((mouse[1] - origin[1]) / scale - midpoint[1], 2)),
-              abs = Math.sqrt(Math.pow((e.clientX - origin[0]) / scale - midpoint[0], 2) +
-                Math.pow((e.clientY - origin[1]) / scale - midpoint[1], 2)) / preabs,
-              tx = midpoint[0] * (1 - abs), ty = midpoint[1] * (1 - abs);
-          t = [t[0]*abs, t[1]*abs, t[2]*abs, t[3]*abs, t[0]*tx + t[2]*ty + t[4], t[1]*tx + t[3]*ty + t[5]]
-        }
-      } else if (keyboard.indexOf("Control") != -1) {
-        let prevec = [(mouse[0] - origin[0]) / scale - midpoint[0], (mouse[1] - origin[1]) / scale - midpoint[1]],
-            vec = [((e.clientX - origin[0]) / scale - midpoint[0]) / prevec[0], ((e.clientY - origin[1]) / scale - midpoint[1]) / prevec[1]],
-            tx = midpoint[0] * (1 - vec[0]), ty = midpoint[1] * (1 - vec[1]);
-        t = [t[0]*vec[0], t[1]*vec[0], t[2]*vec[1], t[3]*vec[1], t[0]*tx + t[2]*ty + t[4], t[1]*tx + t[3]*ty + t[5]]
-      } else {
-        t[4] -= (mouse[0] - e.clientX) / scale;
-        t[5] -= (mouse[1] - e.clientY) / scale
-      }
-      mouse = [e.clientX, e.clientY];
-      sessionStorage.data = JSON.stringify(Object.assign(JSON.parse(sessionStorage.data), {transform: transform.set(t)}));
-      appPort.send({transform: t});
-      showTransform()
-    },
-    mouseup: e => mouse = null,
     unload: () => { if (appPort.remote) appPort.send("connclosed") }
   },
-  polygon: { mousedown: e => mouse = [e.clientX, e.clientY] },
   "#menu": {
     mouseenter: function () {
       this.dataset.active = "";

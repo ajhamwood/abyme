@@ -3,7 +3,7 @@ var clients = {};
 function newChannel() {
   let mc = new MessageChannel();
   clients.display.postMessage(mc.port1, [mc.port1]);
-  clients.ui.postMessage(mc.port2, [mc.port2])
+  setTimeout(() => clients.ui.postMessage(mc.port2, [mc.port2]), 0)
 }
 
 onconnect = ec => {
