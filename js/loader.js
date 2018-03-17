@@ -32,7 +32,7 @@ $.load = function (id) { document.body.appendChild(document.importNode($("#" + i
 // If I coupled two feColorMatrix nodes together would I be able to get "pulsing"?
 // TODO: Save/reload transform settings
 
-var signaluri = "s://signal.arukascloud.io";
+var signaluri = "s://ajh-signal.herokuapp.com";
 
 // TODO: Test prefixed "RTCPeerConnection" in window as well -> inform user of fallback behaviour
 fetch("http" + signaluri, { mode: "no-cors" }).then(() => $.load("remote-js")).catch(() => null);
@@ -116,7 +116,7 @@ var appPort = new AppPort();
 // Connect to worker and other tab
 var messageHandler;
 if ("SharedWorker" in window) { // TODO: inform user of fallback behaviour
-  var worker = new SharedWorker('shared.js');
+  var worker = new SharedWorker('js/shared.js');
   worker.port.onmessage = e => {
     switch (e.data) {
       case "display": $.load("display-js") ;break;
